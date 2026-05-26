@@ -68,21 +68,23 @@ FailWise ingests engineering postmortems, chunks them by incident section, tags 
 
 ## Data flow diagram
 
-raw docs (PDF/MD)
-↓
-loader.py
-↓
-chunker.py  →  [chunk_type, company, year, severity, category]
-↓
-embedder.py  →  ChromaDB
-↓
-retriever.py  ←  user query + filters
-↓
-chain.py  →  GPT-4o-mini
-↓
-FastAPI /query
-↓
-Streamlit UI
+Postmortem docs (PDF/Markdown)
+        ↓
+  Document loader
+        ↓
+  Section-aware chunker       ← splits by: timeline / root cause / resolution / learnings
+        ↓
+  Metadata tagger             ← company, severity, category, year
+        ↓
+  Embedding model             ← OpenAI text-embedding-3-small
+        ↓
+  ChromaDB vector store
+        ↓
+  Retrieval chain (LangChain)
+        ↓
+  FastAPI backend
+        ↓
+  Streamlit frontend
 
 ---
 
