@@ -4,8 +4,7 @@ venv/
 # environment variables (never commit this)
 .env
 
-# chromadb local store
-chroma_store/
+
 
 # python cache
 __pycache__/
