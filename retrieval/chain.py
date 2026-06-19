@@ -14,17 +14,19 @@ def format_docs(docs):
         for doc in docs
     ])
 
-def build_chain(filters: dict = None):
-    vectorstore = load_vectorstore()
 
-    if filters:
-        retriever = vectorstore.as_retriever(
-            search_kwargs={"k": 5, "filter": filters}
-        )
-    else:
-        retriever = vectorstore.as_retriever(
-            search_kwargs={"k": 5}
-        )
+def ask(question: str, filters: dict = None) -> dict:
+    docs = retrieve_with_document_grouping(question, filters)
+    
+    if not docs:
+        return {"answer": "I don't have a postmortem for this in my knowledge base.", "sources": []}
+
+    context = format_docs(docs)
+    
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        temperature=0.2
+    )
 
     prompt = PromptTemplate.from_template("""
 You are FailWise, an AI assistant that answers questions about engineering incidents and postmortems.
@@ -40,30 +42,13 @@ Question: {question}
 
 Answer:""")
 
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
-        temperature=0.2
-    )
-
-    chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
-
-    return chain, retriever
-
-def ask(question: str, filters: dict = None) -> dict:
-    chain, _ = build_chain(filters)
+    chain = prompt | llm | StrOutputParser()
     
-    answer = chain.invoke(question)
+    answer = chain.invoke({"context": context, "question": question})
     
-    # use document grouping for source attribution
-    source_docs = retrieve_with_document_grouping(question, filters)
     sources = list(set([
         doc.metadata.get("source", "unknown")
-        for doc in source_docs
+        for doc in docs
     ]))
 
     return {"answer": answer, "sources": sources}
