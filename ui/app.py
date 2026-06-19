@@ -19,8 +19,15 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-            
-            
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');            
+
+html,
+body,
+[class*="css"],
+[data-testid="stAppViewContainer"] {
+    font-family: Inter, system-ui, sans-serif !important;
+}          
 
 /* ---------- PAGE ---------- */
 
@@ -44,7 +51,7 @@ footer {
 
 .block-container {
     max-width: 760px;
-    padding-top: 4rem;
+    padding-top: 2rem;
     padding-bottom: 3rem;
 }
 
@@ -168,17 +175,6 @@ p, label, div {
     margin: 4px;
 }
 
-.stButton > button {
-    background: white !important;
-    color: #374151 !important;
-    border: 1px solid #E7D9CC !important;
-}
-            
-.stFormSubmitButton > button {
-    background: #C97B63 !important;
-    color: white !important;
-}
-
 /* ---------- DIVIDERS ---------- */
 
 hr {
@@ -196,15 +192,15 @@ hr {
 
 # Header
 
-col1, col2 = st.columns([0.7, 12])
+c1, c2 = st.columns([1, 12])
 
-with col1:
-    st.image("src/failwise.png", width=32)
+with c1:
+    st.image("src/failwise.png", width=28)
 
-with col2:
+with c2:
     st.markdown("""
     <h1 style='margin-bottom:0;'>FailWise</h1>
-    <p style='color:#6B7280; margin-top:0.25rem;'>
+    <p style='color:#6B7280; margin-top:0.2rem; margin-bottom:0;'>
     Explore real engineering failures, incident reports, and postmortems.
     </p>
     """, unsafe_allow_html=True)
@@ -285,7 +281,7 @@ for i, example in enumerate(examples):
 
 st.divider()
 
-st.markdown("### Featured Incidents")
+st.markdown("### Browse the Archive")
 
 st.markdown("""
 - **Cloudflare** — Global DNS Outage (2024)
