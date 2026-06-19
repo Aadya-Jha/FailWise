@@ -64,6 +64,7 @@ def retrieve_with_document_grouping(query: str, filters: dict = None, k: int = 8
     
     # get unique sources from results
     sources = list(set([doc.metadata.get("source") for doc in results]))
+    print("Unique sources:", sources)
     
     # fetch all chunks for those sources
     all_chunks = []
