@@ -54,6 +54,29 @@ def retrieve_full_incident(query: str, k_candidates: int = 10) -> list:
     )
     return full_doc_chunks
 
+def retrieve_with_document_grouping(query: str, filters: dict = None, k: int = 8) -> list:
+    vectorstore = load_vectorstore()
+    
+    if filters:
+        results = vectorstore.similarity_search(query=query, k=k, filter=filters)
+    else:
+        results = vectorstore.similarity_search(query=query, k=k)
+    
+    # get unique sources from results
+    sources = list(set([doc.metadata.get("source") for doc in results]))
+    
+    # fetch all chunks for those sources
+    all_chunks = []
+    for source in sources:
+        source_chunks = vectorstore.similarity_search(
+            query=query,
+            k=50,
+            filter={"source": source}
+        )
+        all_chunks.extend(source_chunks)
+    
+    return all_chunks
+
 if __name__ == "__main__":
     print("=== Test 1: No filter ===")
     results = retrieve("What caused the database outage?")

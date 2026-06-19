@@ -4,7 +4,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-from retrieval.retriever import load_vectorstore
+from retrieval.retriever import load_vectorstore, retrieve_with_document_grouping
 
 load_dotenv()
 
@@ -55,10 +55,12 @@ Answer:""")
     return chain, retriever
 
 def ask(question: str, filters: dict = None) -> dict:
-    chain, retriever = build_chain(filters)
+    chain, _ = build_chain(filters)
     
     answer = chain.invoke(question)
-    source_docs = retriever.invoke(question)
+    
+    # use document grouping for source attribution
+    source_docs = retrieve_with_document_grouping(question, filters)
     sources = list(set([
         doc.metadata.get("source", "unknown")
         for doc in source_docs

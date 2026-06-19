@@ -192,18 +192,15 @@ hr {
 
 # Header
 
-c1, c2 = st.columns([1, 12])
-
-with c1:
-    st.image("src/failwise.png", width=28)
-
-with c2:
-    st.markdown("""
-    <h1 style='margin-bottom:0;'>FailWise</h1>
-    <p style='color:#6B7280; margin-top:0.2rem; margin-bottom:0;'>
-    Explore real engineering failures, incident reports, and postmortems.
-    </p> 
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style='display:flex; align-items:center; gap:10px; margin-bottom:0.3rem;'>
+    <img src='app/static/failwise.png' width='28' style='margin-top:2px;'>
+    <h1 style='margin:0; padding:0;'>FailWise</h1>
+</div>
+<p style='color:#6B7280; margin-top:0.2rem; margin-bottom:0;'>
+Explore real engineering failures, incident reports, and postmortems.
+</p>
+""", unsafe_allow_html=True)
 
 # Search Form
 
