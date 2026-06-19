@@ -1,106 +1,212 @@
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import streamlit as st
 from dotenv import load_dotenv
+
+os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
+
 from retrieval.chain import ask
 
 load_dotenv()
 
 st.set_page_config(
     page_title="FailWise",
-    page_icon="💀",
     layout="centered"
 )
 
 st.markdown("""
 <style>
-    .block-container { padding-top: 2rem; max-width: 760px; }
-    .stTextArea textarea { font-family: monospace; font-size: 14px; }
-    .source-pill {
-        display: inline-block;
-        background: #f0f0f0;
-        color: #333;
-        font-size: 12px;
-        font-family: monospace;
-        padding: 3px 10px;
-        border-radius: 4px;
-        margin: 3px 3px 0 0;
-    }
-    .answer-box {
-        background: #fafafa;
-        border-left: 3px solid #e0e0e0;
-        padding: 1rem 1.25rem;
-        font-size: 15px;
-        line-height: 1.7;
-        border-radius: 0 6px 6px 0;
-        margin-top: 1rem;
-    }
-    h1 { font-size: 1.6rem !important; font-weight: 600 !important; }
-    .subtitle { color: #888; font-size: 14px; margin-top: -0.8rem; margin-bottom: 2rem; }
-    footer { visibility: hidden; }
-    #MainMenu { visibility: hidden; }
+
+.block-container {
+    max-width: 760px;
+    padding-top: 4rem;
+}
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+.stTextInput input {
+    border-radius: 10px;
+    border: 1px solid #2a2a2a;
+    font-size: 15px;
+    padding: 0.6rem;
+}
+
+.source-pill {
+    display: inline-block;
+    border: 1px solid #333;
+    color: #888;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin: 4px;
+}
+
+.result-section {
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+.small-muted {
+    color: #888;
+    font-size: 14px;
+}
+
+hr {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("## 💀 FailWise")
-st.markdown('<p class="subtitle">Search engineering postmortems. Ask what went wrong, why, and how teams recovered.</p>', unsafe_allow_html=True)
+# Header
+
+st.title("FailWise")
+
+st.caption(
+    "Search engineering incidents, outages, and postmortems. "
+    "Understand root causes, mitigations, and lessons learned."
+)
+
+# Stats
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Companies", "12+")
+
+with col2:
+    st.metric("Incidents", "100+")
+
+with col3:
+    st.metric("Categories", "8+")
+
+st.divider()
+
+# Search Form
 
 with st.form("query_form"):
-    question = st.text_area(
-        "Your question",
-        placeholder="e.g. What caused the Cloudflare outage? How did GitHub handle database failovers?",
-        height=100,
-        label_visibility="collapsed"
+
+    question = st.text_input(
+        "",
+        placeholder="What caused the CircleCI outage in 2025?"
     )
 
-    col1, col2, col3 = st.columns([2, 2, 1])
-    with col1:
+    st.caption(
+        "Examples: Cloudflare DNS failure • GitHub database failover • Stripe API outage"
+    )
+
+    with st.expander("Filters"):
+
         company_filter = st.selectbox(
             "Company",
-            ["All", "Cloudflare", "GitHub", "AWS", "Stripe", "Discord",
-             "Datadog", "Reddit", "CircleCI", "Slack", "Spotify", "Zerodha"],
-            label_visibility="visible"
+            [
+                "All",
+                "Cloudflare",
+                "GitHub",
+                "AWS",
+                "Stripe",
+                "Discord",
+                "Datadog",
+                "Reddit",
+                "CircleCI",
+                "Slack",
+                "Spotify",
+                "Zerodha"
+            ]
         )
-    with col2:
+
         category_filter = st.selectbox(
             "Category",
-            ["All", "DNS failure", "Database outage", "Network outage",
-             "Configuration failure", "Database failover failure",
-             "Database migration failure", "Distributed systems failure"],
-            label_visibility="visible"
+            [
+                "All",
+                "DNS failure",
+                "Database outage",
+                "Network outage",
+                "Configuration failure",
+                "Database failover failure",
+                "Database migration failure",
+                "Distributed systems failure"
+            ]
         )
-    with col3:
-        st.markdown("<br>", unsafe_allow_html=True)
-        submitted = st.form_submit_button("Search →", use_container_width=True)
+
+    submitted = st.form_submit_button(
+        "Search Incidents",
+        use_container_width=True
+    )
+
+# Search Results
 
 if submitted:
+
     if not question.strip():
         st.warning("Enter a question first.")
+
     else:
+
         filters = {}
+
         if company_filter != "All":
             filters["company"] = company_filter
+
         if category_filter != "All":
             filters["category"] = category_filter
 
         with st.spinner("Searching postmortems..."):
-            try:
-                result = ask(question, filters if filters else None)
 
-                st.markdown(f'<div class="answer-box">{result["answer"]}</div>', unsafe_allow_html=True)
+            try:
+
+                result = ask(
+                    question,
+                    filters if filters else None
+                )
+
+                st.divider()
+
+                st.subheader("Analysis")
+
+                st.markdown(
+                    f"""
+                    <div class="result-section">
+                    {result["answer"]}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
                 if result["sources"]:
-                    st.markdown("<br>**Sources**", unsafe_allow_html=True)
-                    pills = " ".join([
-                        f'<span class="source-pill">{s.replace(".md", "")}</span>'
-                        for s in result["sources"]
-                    ])
-                    st.markdown(pills, unsafe_allow_html=True)
+
+                    st.markdown("#### Sources")
+
+                    pills = " ".join(
+                        [
+                            f'<span class="source-pill">{s.replace(".md", "")}</span>'
+                            for s in result["sources"]
+                        ]
+                    )
+
+                    st.markdown(
+                        pills,
+                        unsafe_allow_html=True
+                    )
 
             except Exception as e:
-                st.error(f"Something went wrong: {str(e)}")
 
-st.markdown("---")
-st.markdown('<p style="color:#bbb; font-size:12px;">Built on real postmortems from Cloudflare, AWS, GitHub, Stripe and others.</p>', unsafe_allow_html=True)
+                st.error(
+                    f"Something went wrong: {str(e)}"
+                )
+
+st.divider()
+
+st.caption(
+    "Built using public engineering postmortems from Cloudflare, AWS, GitHub, Stripe, CircleCI and other infrastructure teams."
+)
