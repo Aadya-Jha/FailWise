@@ -248,21 +248,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Stats
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.metric("Companies", "12+")
-
-with col2:
-    st.metric("Incidents", "100+")
-
-with col3:
-    st.metric("Categories", "8+")
-
-st.divider()
-
 # Search Form
 
 with st.form("query_form"):
