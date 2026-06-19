@@ -202,7 +202,7 @@ with c2:
     <h1 style='margin-bottom:0;'>FailWise</h1>
     <p style='color:#6B7280; margin-top:0.2rem; margin-bottom:0;'>
     Explore real engineering failures, incident reports, and postmortems.
-    </p>
+    </p> 
     """, unsafe_allow_html=True)
 
 # Search Form
