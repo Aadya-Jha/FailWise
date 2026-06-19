@@ -33,6 +33,27 @@ def retrieve(query: str, filters: dict = None, k: int = 5) -> list:
     
     return results
 
+def retrieve_full_incident(query: str, k_candidates: int = 10) -> list:
+    vectorstore = load_vectorstore()
+    
+    # Stage 1: cast a wider net to find the most relevant incident
+    candidates = vectorstore.similarity_search_with_score(query, k=k_candidates)
+    
+    # Tally which incident_id shows up most / scores best
+    from collections import Counter
+    incident_scores = Counter()
+    for doc, score in candidates:
+        iid = doc.metadata.get("incident_id")
+        incident_scores[iid] += 1  # or sum(1/score) for weighted ranking
+
+    top_incident_id = incident_scores.most_common(1)[0][0]
+
+    # Stage 2: pull EVERY chunk belonging to that one incident
+    full_doc_chunks = vectorstore.get(
+        where={"incident_id": top_incident_id}
+    )
+    return full_doc_chunks
+
 if __name__ == "__main__":
     print("=== Test 1: No filter ===")
     results = retrieve("What caused the database outage?")
