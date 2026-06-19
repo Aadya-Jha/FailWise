@@ -19,6 +19,8 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+            
+            
 
 /* ---------- PAGE ---------- */
 
@@ -95,30 +97,38 @@ p, label, div {
     font-weight: 500;
 }
 
-/* ---------- BUTTON ---------- */
+/* Popular search buttons */
 
-.stButton > button,
-.stFormSubmitButton > button {
-
-    background-color: #C97B63 !important;
-    color: white !important;
-
-    border: none !important;
+.stButton > button {
+    background: white !important;
+    color: #374151 !important;
+    border: 1px solid #E7D9CC !important;
     border-radius: 10px !important;
-
-    height: 42px;
-
+    height: 38px !important;
     transition: 0.2s ease;
 }
 
-.stButton > button:hover,
-.stFormSubmitButton > button:hover {
-
-    background-color: #B86A53 !important;
-
-    transform: translateY(-1px);
+.stButton > button:hover {
+    border-color: #C97B63 !important;
 }
 
+/* Search button */
+
+.stFormSubmitButton > button {
+    background: #C97B63 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    height: 42px !important;
+    font-weight: 600 !important;
+    transition: 0.2s ease;
+}
+
+.stFormSubmitButton > button:hover {
+    background: #B86A53 !important;
+    transform: translateY(-1px);
+}
+            
 /* ---------- RESULT AREA ---------- */
 
 .result-section {
@@ -158,6 +168,17 @@ p, label, div {
     margin: 4px;
 }
 
+.stButton > button {
+    background: white !important;
+    color: #374151 !important;
+    border: 1px solid #E7D9CC !important;
+}
+            
+.stFormSubmitButton > button {
+    background: #C97B63 !important;
+    color: white !important;
+}
+
 /* ---------- DIVIDERS ---------- */
 
 hr {
@@ -175,15 +196,15 @@ hr {
 
 # Header
 
-col1, col2 = st.columns([1, 10])
+col1, col2 = st.columns([0.7, 12])
 
 with col1:
-    st.image("src/failwise.png", width=36)
+    st.image("src/failwise.png", width=32)
 
 with col2:
     st.markdown("""
     <h1 style='margin-bottom:0;'>FailWise</h1>
-    <p style='color:#6B7280; margin-top:0;'>
+    <p style='color:#6B7280; margin-top:0.25rem;'>
     Explore real engineering failures, incident reports, and postmortems.
     </p>
     """, unsafe_allow_html=True)
@@ -236,9 +257,10 @@ with st.form("query_form"):
             ]
         )
 
-    col1, col2 = st.columns([5,1])
-    with col2:
-        submitted = st.form_submit_button("Search")
+    submitted = st.form_submit_button(
+        "Search",
+        use_container_width=True
+    )
 
 #Example Questions
 
