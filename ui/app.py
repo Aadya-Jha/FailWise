@@ -164,19 +164,6 @@ hr {
     border-color: #E7D9CC;
 }
 
-/* ---------- METRICS ---------- */
-
-[data-testid="metric-container"] {
-
-    background: white;
-
-    border: 1px solid #E7D9CC;
-
-    border-radius: 10px;
-
-    padding: 0.75rem;
-}
-
 /* ---------- SPINNER ---------- */
 
 [data-testid="stSpinner"] {
@@ -186,75 +173,29 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<style>
-
-.block-container {
-    max-width: 760px;
-    padding-top: 4rem;
-}
-
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-.stTextInput input {
-    border-radius: 10px;
-    border: 1px solid #2a2a2a;
-    font-size: 15px;
-    padding: 0.6rem;
-}
-
-.source-pill {
-    display: inline-block;
-    border: 1px solid #333;
-    color: #888;
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    margin: 4px;
-}
-
-.result-section {
-    line-height: 1.8;
-    font-size: 15px;
-}
-
-.small-muted {
-    color: #888;
-    font-size: 14px;
-}
-
-hr {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
 # Header
 
-st.title("FailWise")
+col1, col2 = st.columns([1, 10])
 
-st.markdown(
-    "<p style='color:#6B7280;'>"
-    "Explore real engineering failures, incident reports, and postmortems."
-    "</p>",
-    unsafe_allow_html=True
-)
+with col1:
+    st.image("src/failwise.png", width=36)
+
+with col2:
+    st.markdown("""
+    <h1 style='margin-bottom:0;'>FailWise</h1>
+    <p style='color:#6B7280; margin-top:0;'>
+    Explore real engineering failures, incident reports, and postmortems.
+    </p>
+    """, unsafe_allow_html=True)
 
 # Search Form
 
 with st.form("query_form"):
 
     question = st.text_input(
-        "",
-        placeholder="What caused the CircleCI outage in 2025?"
+    "",
+    value=st.session_state.get("question", ""),
+    placeholder="Search incidents, outages, and postmortems..."
     )
 
     st.caption(
@@ -295,10 +236,44 @@ with st.form("query_form"):
             ]
         )
 
-    submitted = st.form_submit_button(
-        "Search Incidents",
-        use_container_width=True
-    )
+    col1, col2 = st.columns([5,1])
+    with col2:
+        submitted = st.form_submit_button("Search")
+
+#Example Questions
+
+examples = [
+    "What caused the CircleCI outage in 2025?",
+    "Why did Cloudflare's DNS fail?",
+    "How did GitHub recover from database failovers?",
+    "What caused Stripe API outages?",
+]
+
+st.markdown("##### Popular searches")
+
+cols = st.columns(2)
+
+for i, example in enumerate(examples):
+    with cols[i % 2]:
+        if st.button(example, use_container_width=True):
+            st.session_state.question = example
+            st.rerun()
+
+#Featured Incidents
+
+st.divider()
+
+st.markdown("### Featured Incidents")
+
+st.markdown("""
+- **Cloudflare** — Global DNS Outage (2024)
+            
+- **GitHub** — Database Failover Incident (2023)
+            
+- **CircleCI** — Build Pipeline Outage (2025)
+            
+- **Stripe** — API Availability Incident (2022)
+""")
 
 # Search Results
 
@@ -361,8 +336,27 @@ if submitted:
                     f"Something went wrong: {str(e)}"
                 )
 
+#Footer
+
 st.divider()
 
-st.caption(
-    "Built using public engineering postmortems from Cloudflare, AWS, GitHub, Stripe, CircleCI and other infrastructure teams."
+st.markdown(
+    """
+    <div style="
+        text-align:center;
+        color:#6B7280;
+        padding-top:10px;
+        font-size:14px;
+    ">
+        Built from public postmortems and incident reports from
+        <b>Cloudflare</b> ·
+        <b>AWS</b> ·
+        <b>GitHub</b> ·
+        <b>Stripe</b> ·
+        <b>CircleCI</b> ·
+        <b>Slack</b> ·
+        <b>Datadog</b>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
