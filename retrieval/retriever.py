@@ -3,6 +3,9 @@ from dotenv import load_dotenv
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 load_dotenv()
+import streamlit as st
+
+@st.cache_resource
 
 def load_vectorstore() -> Chroma:
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

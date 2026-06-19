@@ -18,15 +18,6 @@ def format_docs(docs):
 def ask(question: str, filters: dict = None) -> dict:
     docs = retrieve_with_document_grouping(question, filters)
     
-    print(f"Total docs retrieved: {len(docs)}")
-    for d in docs[:3]:
-        print(d.metadata)
-        print(d.page_content[:100])
-        print("---")
-    
-    context = format_docs(docs)
-    print(f"Context length: {len(context)}")
-
     if not docs:
         return {"answer": "I don't have a postmortem for this in my knowledge base.", "sources": []}
 
